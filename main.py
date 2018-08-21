@@ -1,14 +1,15 @@
-import functions as f
+#!/usr/bin/env python3.6
+
 from os import listdir, chdir, rename, remove, walk
 import os
+from tkinter import filedialog
+from tkinter import *
 
 # ----------------------
 #
 #    CONFIGURATION
 #
 # ----------------------
-# DIR_NAME = '/home/moshe/Documents/.temp/file_names/'
-DIR_NAME = '/media/moshe/Moshe\'s Hardrive Unlocked/My Files/Old computer backup/disk files/Shuki 2/'
 VERBOSE = True
 
 
@@ -20,10 +21,6 @@ def clean_file_name(file_name):
     return file_name[:begin - 1] + file_name[end + 1:]
 
 
-def isHebrew(text):
-    return any("\u0590" <= c <= "\u05EA" for c in text)
-
-
 def clean_files(files):
     completed_files = []
     changes = 0
@@ -31,7 +28,6 @@ def clean_files(files):
     skiped = 0
     for file in files:
         if '(' in file and ')' in file:
-            if isHebrew(file) is False:
                 clean_name = clean_file_name(file)
 
                 if clean_name in completed_files:
@@ -47,10 +43,6 @@ def clean_files(files):
 
                     completed_files.append(clean_name)
 
-            else:
-                skiped += 1
-                if VERBOSE is True:
-                    print(f'This file has Hebrew charecters. Skipping...')
         else:
             skiped += 1
             if VERBOSE is True:
@@ -67,16 +59,48 @@ def main(files):
 
 
 if __name__ == '__main__':
-    chdir(DIR_NAME)
+    print('Welcome to the Windows File History date stamp and duplicate '
+          'remover')
+    input('Press "ENTER" to use the dialogue to chose the starting directory')
+    root = Tk()
+    root.withdraw()
+
+    chose_file = False
+    while chose_file is False:
+        DIR_NAME = filedialog.askdirectory() + '/'
+        print('The selected directory is: ' + DIR_NAME)
+        confirm = input('Are you sure you would like to continue? y/n '
+                        '("quit" to cancel) ')
+        print('Confirm = ' + str(confirm))
+        if confirm == 'n':
+            print('Make another selection.')
+        elif confirm == 'y':
+            chose_file = True
+        elif confirm == 'quit':
+            print('Quiting...')
+            quit()
+        else:
+            print('Input not valid. Please chose a file.')
+
+    print('IMPORTANT: Once this program runs, the file names')
+    print('and deleted files may not be recovered. This program is as is and')
+    print('without any warrenties.')
+    print('Changes will be made to files in ' + DIR_NAME)
+    confirm = input('Are you sure you would like to proceed? y/n ')
+    if confirm != 'y':
+        print('Quiting...')
+        quit()
+
+    # chdir(DIR_NAME)
 
     file_list = []
     files = []
     test = 0
-    for dirname, dirnames, filenames in os.walk('.'):
+    for dirname, dirnames, filenames in os.walk(DIR_NAME):
 
         # get path to all subdirectories first.
-        for subdirname in dirnames:
-            files.append(os.path.join(dirname, subdirname))
+        # for subdirname in dirnames:
+        #     files.append(os.path.join(dirname, subdirname))
 
         # get path to all filenames.
         for filename in filenames:
